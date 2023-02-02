@@ -104,6 +104,8 @@ description: |
 grade: stable
 confinement: strict
 
+adopt-info: uros-agent
+
 architectures:
   - build-on: amd64
   - build-on: arm64
@@ -115,16 +117,17 @@ package-repositories:
   formats: [deb]
   key-id: C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
   key-server: keyserver.ubuntu.com
-  suites: [focal]
+  suites: [jammy]
   type: apt
   url: http://repo.ros2.org/ubuntu/main
 
 parts:
   ros2-humble-extension:
     build-packages: [ros-humble-ros-core]
-    override-build: install -D -m 0755 launch ${SNAPCRAFT_PART_INSTALL}/snap/command-chain/ros2-launch
+    override-build: install -D -m 0755 $CRAFT_PART_BUILD/extensions/ros2/launch ${SNAPCRAFT_PART_INSTALL}/snap/command-chain/ros2-launch
+    source-subdir: extensions/ros2
     plugin: nil
-    source: $SNAPCRAFT_EXTENSIONS_DIR/ros2
+    source: https://github.com/snapcore/snapcraft.git
 
   uros-agent:
     plugin: colcon
@@ -156,13 +159,19 @@ parts:
 apps:
   micro-ros-agent:
     command: opt/ros/snap/lib/micro_ros_agent/micro_ros_agent
+    command-chain: [snap/command-chain/ros2-launch]
     environment:
         FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
+        ROS_DISTRO: humble
+        ROS_VERSION: 2
     plugs: [network, network-bind, serial-port]
 
   daemon:
     command: usr/bin/micro-ros-agent-daemon
+    command-chain: [snap/command-chain/ros2-launch]
     environment:
         FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
+        ROS_DISTRO: humble
+        ROS_VERSION: 2
     daemon: simple
     plugs: [network, network-bind, serial-port]
