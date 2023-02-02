@@ -1,5 +1,5 @@
 name: micro-ros-agent-sources
-base: core20
+base: core22
 version: git
 summary: Bridge between Micro ROS client applications and ROS 2
 description: |
@@ -120,8 +120,8 @@ package-repositories:
   url: http://repo.ros2.org/ubuntu/main
 
 parts:
-  ros2-foxy-extension:
-    build-packages: [ros-foxy-ros-core]
+  ros2-humble-extension:
+    build-packages: [ros-humble-ros-core]
     override-build: install -D -m 0755 launch ${SNAPCRAFT_PART_INSTALL}/snap/command-chain/ros2-launch
     plugin: nil
     source: $SNAPCRAFT_EXTENSIONS_DIR/ros2
@@ -133,18 +133,18 @@ parts:
       - -DMICROROSAGENT_SUPERBUILD=ON
       - --cmake-force-configure
     override-pull: |
-        snapcraftctl pull
+        craftctl default
 
         version="$(git describe --always --tags| sed -e 's/^v//;s/-/+git/;y/-/./')"
         [ -n "$(echo $version | grep "+git")" ] && grade=devel || grade=stable
-        snapcraftctl set-version "$version"
-        snapcraftctl set-grade "$grade"
+        craftctl set version="$version"
+        craftctl set grade="$grade"
 
     build-packages: [make, gcc, g++]
-    stage-packages: [ros-foxy-ros2launch]
+    stage-packages: [ros-humble-ros2launch]
     build-environment:
     - ROS_VERSION: '2'
-    - ROS_DISTRO: foxy
+    - ROS_DISTRO: humble
 
   runner:
     plugin: dump
