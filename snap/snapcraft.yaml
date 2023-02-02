@@ -1,4 +1,4 @@
-name: micro-ros-agent
+name: micro-ros-agent-sources
 base: core20
 version: git
 summary: Bridge between Micro ROS client applications and ROS 2
